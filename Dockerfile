@@ -44,11 +44,12 @@ RUN mamba install --quiet --yes \
     fix-permissions "/home/${NB_USER}"
 
 # Install Tensorflow with pip
+# DISABLED FOR NOW AS IT DOES NOT WORK [TF SEGFAULTS ON IMPORT]!!
 # hadolint ignore=DL3013
-RUN pip install --no-cache-dir tensorflow keras && \
-   #torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116 && \ #FOR CUDA 11.6
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
+#RUN pip install --no-cache-dir tensorflow-cpu keras && \
+   # torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116 && \ #FOR CUDA 11.6
+   # fix-permissions "${CONDA_DIR}" && \
+   # fix-permissions "/home/${NB_USER}"
 
 WORKDIR "${HOME}"
 
