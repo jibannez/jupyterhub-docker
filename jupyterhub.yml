@@ -1,0 +1,50 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+# JupyterHub docker-compose configuration file
+version: "3"
+
+services:
+  hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        JUPYTERHUB_VERSION: 3.0.0
+    restart: always
+    image: jibannez00/jupyterhub:v2023.06
+    container_name: jupyterhub
+    networks:
+      - jupyterhub-network
+    volumes:
+      # The JupyterHub configuration file
+      #- "./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro"
+      - /docker/config/jupyterhub/jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      - /docker/data/jupyterhub/data:/data
+
+    ports:
+      - "8000:8000"
+    environment:
+      # This username will be a JupyterHub admin
+      JUPYTERHUB_ADMIN: jorge
+      # All containers will join this network
+      DOCKER_NETWORK_NAME: jupyterhub-network
+      # JupyterHub will spawn this Notebook image for users
+      DOCKER_NOTEBOOK_IMAGE: jibannez00/jupyterhub:v2023.06
+      #DOCKER_NOTEBOOK_IMAGE: tensorflow/tensorflow:nightly-jupyter
+
+      # Notebook directory inside user image
+      #DOCKER_NOTEBOOK_DIR: /home/jovyan/
+
+      # Using this run command
+      DOCKER_SPAWN_CMD: start-singleuser.sh
+    command: >
+      jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+
+networks:
+  jupyterhub-network:
+    name: jupyterhub-network
