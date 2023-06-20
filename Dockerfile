@@ -17,6 +17,14 @@ RUN apt-get update --yes &&\
     apt-get clean
     #apt-get install --yes --no-install-recommends octave octave-statistics octave-signal octave-optim octave-nlopt octave-general octave-geometry octave-image octave-io octave-linear-algebra gnuplot fonts-freefont-otf
 
+# Add user to docker group to allow DockerSpawner without root.
+# This assumes that docker group in the host is 123, thus:
+# IN THE MACHINE THAT RUNS THIS IMAGE YOU HAVE TO CREATE A DOCKER GROUP WITH GID 123!
+# user creation is commented out because jovyan is already created in the base image
+RUN addgroup --system --gid 123 docker && \
+    #useradd -m ${NB_USER} && \
+    usermod -a -G users,docker ${NB_USER}
+
 # Install rise for notebooks and for labs, and a few additional python packages
 USER ${NB_UID}
 RUN pip install --no-cache-dir \
@@ -25,7 +33,7 @@ RUN pip install --no-cache-dir \
     RISE \
     nbslide \
     jupyterlab_rise \
-    roboticstoolbox-python \
+    #roboticstoolbox-python \
     pingouin \
     plotly \
     plotly-geo \
